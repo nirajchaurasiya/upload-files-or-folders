@@ -1,0 +1,46 @@
+.folder-container {
+  width: 300px;
+  max-height: 500px;
+  height: 500px;
+  overflow-y: scroll;
+  margin-top: 10px;
+  margin-left: 10px;
+  border: 1px solid rgb(62, 62, 62);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.folders {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.folder {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.folder-name {
+  font-size: 16px;
+}
+
+.files {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: 20px;
+}
+.file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.file:hover,
+.folder:hover {
+  cursor: pointer;
+}
+.file-name {
+  margin-top: -5px;
+  font-size: 16px;
+}

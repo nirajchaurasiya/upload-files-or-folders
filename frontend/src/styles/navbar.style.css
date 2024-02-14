@@ -1,0 +1,10 @@
+.navbar-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border-bottom: 1px solid rgb(77, 75, 75);
+}
+.navbar-container .navbar-midcontainer {
+  display: flex;
+  gap: 10px;
+}

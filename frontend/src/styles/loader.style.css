@@ -1,0 +1,37 @@
+.loader-container {
+  /* From https://css.glass */
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  width: 100vw;
+  top: 0;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+.spinner {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.spinner .rotate {
+  border: 7px solid rgb(83, 255, 83);
+  height: 50px;
+  width: 50px;
+  border-radius: 100%;
+  border-top: 10px solid transparent;
+  animation: spinner 1s linear infinite;
+}
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
