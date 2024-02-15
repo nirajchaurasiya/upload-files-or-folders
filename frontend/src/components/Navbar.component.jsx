@@ -8,8 +8,11 @@ export default function Navbar() {
   return (
     <div className="navbar-container">
       <div className="navbar-midcontainer">
-        <p>Total Files: {allFiles?.length}</p>
-        <p>Total Folders: {allFolders?.length}</p>
+        {/* <p>Total Files: {allFiles?.length}</p>
+        <p>Total Folders: {allFolders?.length}</p> */}
+        <p>
+          Upload your file on <span>Uploadify</span>
+        </p>
       </div>
     </div>
   );

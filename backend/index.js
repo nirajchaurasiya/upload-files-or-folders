@@ -1,18 +1,35 @@
 const app = require("./app");
+const upload = require("./middlewares/multer.middleware");
 const fileSchema = require("./models/file.model");
 const folderSchema = require("./models/folder.model");
+const { uploadToSpaces } = require("./utils/objectStorage");
 const PORT = process.env.PORT;
 
-app.post("/api/v1/add-file", async (req, res) => {
+app.post("/api/v1/add-file", upload.single("file"), async (req, res) => {
   try {
-    const { title } = req.body;
+    const filePath = req.file?.path;
+    const fileType = req.file.mimetype;
     let type = req.body.type || 0;
-    if (!title) {
+    const title = req.file.filename;
+    if (!(filePath && fileType)) {
       return res.status(400).json({
         success: false,
-        msg: "Type or Title is undefined",
+        msg: "File path or type is undefined",
       });
     }
+    const getURL = await uploadToSpaces(
+      filePath,
+      fileType,
+      process.env.SPACES_ACL_PUBLIC
+    );
+
+    if (!getURL) {
+      return res.status(400).json({
+        success: false,
+        msg: "Something went wrong while uploading the file",
+      });
+    }
+
     const isFileTitleExists = await fileSchema.findOne({
       title: title?.toLowerCase()?.trim(),
     });
@@ -27,6 +44,7 @@ app.post("/api/v1/add-file", async (req, res) => {
     await fileSchema.create({
       title,
       type,
+      url: getURL.url,
     });
 
     const getAllFiles = await fileSchema.find();
@@ -280,56 +298,79 @@ app.post("/api/v1/add-folder-in-folder", async (req, res) => {
   }
 });
 
-app.post("/api/v1/add-file-in-folder", async (req, res) => {
-  try {
-    const { title, folderName } = req.body;
+app.post(
+  "/api/v1/add-file-in-folder",
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const filePath = req.file?.path;
+      const fileType = req.file.mimetype;
+      let type = req.body.type || 0;
+      const title = req.file.filename;
+      if (!(filePath && fileType)) {
+        return res.status(400).json({
+          success: false,
+          msg: "File path or type is undefined",
+        });
+      }
+      const getURL = await uploadToSpaces(
+        filePath,
+        fileType,
+        process.env.SPACES_ACL_PUBLIC
+      );
 
-    let type = folderName ? 1 : 0;
-    if (!title) {
-      return res.status(400).json({
-        success: false,
-        msg: "Type or Title is undefined",
+      if (!getURL) {
+        return res.status(400).json({
+          success: false,
+          msg: "Something went wrong while uploading the file",
+        });
+      }
+
+      const isFileTitleExists = await fileSchema.findOne({
+        title: title?.toLowerCase()?.trim(),
       });
-    }
-    const folder = await folderSchema.findOne({ title: folderName });
 
-    if (!folder) {
-      return res.status(400).json({
-        success: false,
-        msg: "We couldn't find the folder to store",
+      if (isFileTitleExists) {
+        return res.status(400).json({
+          success: false,
+          msg: "File with Title already exists",
+        });
+      }
+
+      const folder = await folderSchema.findOne({ title: req.body.folderName });
+
+      const create_file = await fileSchema.create({
+        title,
+        type,
+        url: getURL.url,
       });
-    }
 
-    const create_file = await fileSchema.create({
-      title,
-      type,
-    });
-
-    await folderSchema.findByIdAndUpdate(
-      folder?._id,
-      {
-        $addToSet: {
-          files: {
-            fileId: create_file?._id,
+      await folderSchema.findByIdAndUpdate(
+        folder?._id,
+        {
+          $addToSet: {
+            files: {
+              fileId: create_file?._id,
+            },
           },
         },
-      },
-      {
-        new: true,
-      }
-    );
+        {
+          new: true,
+        }
+      );
 
-    const getAllFolders = await folderSchema.find();
-    return res.status(200).json({
-      success: true,
-      data: getAllFolders,
-      msg: "Folder added successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      msg: error?.message || "Something went wrong while adding the file",
-    });
+      const getAllFolders = await folderSchema.find();
+      return res.status(200).json({
+        success: true,
+        data: getAllFolders,
+        msg: "Folder added successfully",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        msg: error?.message || "Something went wrong while adding the file",
+      });
+    }
   }
-});
+);
 app.listen(PORT, () => {});

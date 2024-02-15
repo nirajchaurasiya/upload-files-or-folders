@@ -1,25 +1,88 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useSearchParams } from "react-router-dom";
 import { getFileData } from "../utils/getFileWithName";
+import Loader from "./Loader.component";
 export default function OpenFile() {
   const { fileName } = useParams();
-  const [file, setFile] = useState({});
+  const [filedata, setFile] = useState({});
+  const [loader, setLoader] = useState(true);
+  const location = useLocation();
+  const fileValue = location.search.slice(6);
   useEffect(() => {
-    async function getFile(fileName) {
-      const file = await getFileData(fileName);
-      if (file?.data) {
-        setFile(file.data);
+    async function getFile(fileName, fileValue) {
+      if (fileValue) {
+        const file = await getFileData(fileValue);
+        const fileData = file?.data;
+        if (fileData) {
+          setFile(file.data);
+        }
+        setLoader(false);
+      } else {
+        const file = await getFileData(fileName);
+        const fileData = file?.data;
+        if (fileData) {
+          setFile(file.data);
+        }
+        setLoader(false);
       }
     }
-    getFile(fileName);
-  }, [fileName]);
+    setLoader(true);
+    getFile(fileName, fileValue);
+  }, [fileName, fileValue]);
 
-  if (!fileName) {
+  if (!(fileName || fileValue)) {
     return null;
   }
-  return (
-    <div>
-      <p>{file?.title}</p>
+
+  return loader ? (
+    <Loader />
+  ) : (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        margin: "auto",
+      }}
+    >
+      {filedata?.title?.split(".").map((file) => {
+        if (
+          !(
+            file === "png" ||
+            file === "mp3" ||
+            file === "mp4" ||
+            file === "jpg" ||
+            file === "mkv"
+          )
+        )
+          return null;
+        console.log(file);
+        return (
+          <div key={file}>
+            {(file === "png" || file === "jpg" || file === "jpeg") && (
+              <img
+                style={{
+                  width: "600px",
+                  maxWidth: "80%",
+                  backgroundColor: "gray",
+                }}
+                src={filedata?.url}
+                alt="Image"
+              />
+            )}
+            {file === "mp3" && <audio src={filedata?.url} controls></audio>}
+            {file === "mp4" ||
+              (file === "mkv" && (
+                <video
+                  style={{ width: "600px" }}
+                  src={filedata?.url}
+                  controls
+                  autoPlay
+                ></video>
+              ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

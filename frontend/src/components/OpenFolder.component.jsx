@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { getFolderData } from "../utils/getFolderWithName";
 export default function OpenFolder() {
   const { folderName } = useParams();
-
   const [folder, setFolder] = useState({});
-
+  const location = useLocation();
+  const fileValue = location.search.slice(6);
   useEffect(() => {
     const getFolder = async (folderName) => {
       if (folderName) {
@@ -16,15 +16,37 @@ export default function OpenFolder() {
       }
     };
     getFolder(folderName);
-  }, [folderName]);
+  }, [folderName, fileValue]);
 
-  if (!folderName) {
+  if (folderName && fileValue) {
     return null;
   }
 
   return (
     <div>
-      <p>{folder?.title}</p>
+      {fileValue || folderName ? (
+        <p
+          style={{
+            marginLeft: "20px",
+            marginTop: "20px",
+            fontSize: "20px",
+            fontWeight: "600",
+          }}
+        >
+          {folder?.title}
+        </p>
+      ) : (
+        <p
+          style={{
+            marginLeft: "20px",
+            marginTop: "20px",
+            fontSize: "20px",
+            fontWeight: "600",
+          }}
+        >
+          Please click on a file to see!
+        </p>
+      )}
     </div>
   );
 }

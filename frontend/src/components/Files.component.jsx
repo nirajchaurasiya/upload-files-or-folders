@@ -1,8 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 export default function File({ data }) {
+  const { folderName } = useParams();
   return (
-    <Link to={`/file/${data?.title}`}>
+    <Link
+      to={
+        folderName
+          ? `/folder/${folderName}?file=${data?.title}`
+          : `/file/${data?.title}`
+      }
+    >
       <div key={data} className="file">
         <div className="file-svg">
           <svg

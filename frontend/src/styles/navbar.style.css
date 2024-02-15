@@ -8,3 +8,10 @@
   display: flex;
   gap: 10px;
 }
+.navbar-container .navbar-midcontainer p {
+  font-size: 17px;
+}
+.navbar-container .navbar-midcontainer p span {
+  font-weight: 800;
+  color: rgb(90, 251, 90);
+}

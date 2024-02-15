@@ -4,8 +4,11 @@ import AddFolder from "./AddFolder.component";
 import FoldersAndFiles from "./FoldersAndFiles.component";
 import OpenFile from "./OpenFile.component";
 import OpenFolder from "./OpenFolder.component";
-
+import { useLocation, useParams } from "react-router-dom";
 export default function HomeElem() {
+  const { fileName } = useParams();
+  const location = useLocation();
+  const fileValue = location.search.slice(6);
   return (
     <div>
       <div
@@ -21,8 +24,7 @@ export default function HomeElem() {
       </div>
       <div className="folders-container" style={{ display: "flex" }}>
         <FoldersAndFiles />
-        <OpenFile />
-        <OpenFolder />
+        {fileValue || fileName ? <OpenFile /> : <OpenFolder />}
       </div>
     </div>
   );
